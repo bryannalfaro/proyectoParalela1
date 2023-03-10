@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     int windowHeight = 480;
 
     int phi = 10;
-    int N = 50;
+    int N = 30;
     bool game_is_running = true;
 
     // returns zero on success else non-zero
@@ -89,6 +89,37 @@ int main(int argc, char *argv[])
         SDL_RenderClear(rend);
 
         for (int j = 0; j < N; j++) {
+            //Check collision with the others
+            for (int i = 0; i < N; i++) {
+                if (i == j) {
+                    continue;
+                }
+               SDL_bool inter = SDL_HasIntersection(&rect[j], &rect[i]);
+               if(inter) {
+                    //change color of the rectangles
+
+                    colors[j][0] = rand() % 255;
+                    colors[j][1] = rand() % 255;
+                    colors[j][2] = rand() % 255;
+                    colors[i][0] = rand() % 255;
+                    colors[i][1] = rand() % 255;
+                    colors[i][2] = rand() % 255;
+
+                    //change the initial position of the rectangles
+                    rect[j].x = rand() % windowWidth;
+                    rect[j].y = rand() % windowWidth;
+                    rect[i].x = rand() % windowWidth;
+                    rect[i].y = rand() % windowWidth;
+                    initial_pos[j][0] = rect[j].x;
+                    initial_pos[j][1] = rect[j].y;
+                    initial_pos[i][0] = rect[i].x;
+                    initial_pos[i][1] = rect[i].y;
+
+
+
+               }
+
+            }
             //use cosine function to move the rectangles
             rect[j].x = initial_pos[j][0] + amplitudes[j] * cos(((2*M_PI)/periods[j])*time_e+phi);
             rect[j].y = initial_pos[j][1] + amplitudes[j] * sin(((2*M_PI)/periods[j])*time_e+phi);
