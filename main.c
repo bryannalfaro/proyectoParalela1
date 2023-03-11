@@ -1,9 +1,8 @@
 //TODO
-//oscilar en ambos ejes
 //cambiar amplitudes y periodos
 //choques cambian movimiento y particiona
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+// #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
 #include <cstdlib>
@@ -18,7 +17,7 @@ int main(int argc, char *argv[])
     int windowHeight = 480;
 
     int phi = 10;
-    int N = 30;
+    int N = 10;
     bool game_is_running = true;
 
     // returns zero on success else non-zero
@@ -38,9 +37,11 @@ int main(int argc, char *argv[])
     SDL_Rect rect[N];
     // initial position of the rectangles
     int initial_pos[N][2];
-    int amplitudes[N];
+    int amplitudes[N][2];
+    int directions[N];
     int periods[N];
     int colors[N][3];
+    int angular_velocities[N];
      srand(time(NULL));
     //set the properties of the rectangles
     for (int i = 0; i < N; i++) {
@@ -51,13 +52,17 @@ int main(int argc, char *argv[])
         rect[i].h = x;
         initial_pos[i][0] = rect[i].x;
         initial_pos[i][1] = rect[i].y;
+        directions[i] = 1;
 
-        amplitudes[i] = rand() % 100;
+        amplitudes[i][0] = rand() % 100;
+        amplitudes[i][1] = amplitudes[i][0];
         periods[i] = rand() % 10;
         //asign random colors to the rectangles;
         colors[i][0] = rand() % 255;
         colors[i][1] = rand() % 255;
         colors[i][2] = rand() % 255;
+
+        angular_velocities[i] = ((2*M_PI)/periods[i]);
 
     }
 
@@ -96,33 +101,34 @@ int main(int argc, char *argv[])
                 }
                SDL_bool inter = SDL_HasIntersection(&rect[j], &rect[i]);
                if(inter) {
+                    // already_collidedX = i;
+                    // already_collidedY = j;
+                    printf("collision detected en i: %d, j: %d\n", i, j);
                     //change color of the rectangles
 
-                    colors[j][0] = rand() % 255;
-                    colors[j][1] = rand() % 255;
-                    colors[j][2] = rand() % 255;
-                    colors[i][0] = rand() % 255;
-                    colors[i][1] = rand() % 255;
-                    colors[i][2] = rand() % 255;
+                    // colors[j][0] = rand() % 255;
+                    // colors[j][1] = rand() % 255;
+                    // colors[j][2] = rand() % 255;
+                    // colors[i][0] = rand() % 255;
+                    // colors[i][1] = rand() % 255;
+                    // colors[i][2] = rand() % 255;
 
                     //change the initial position of the rectangles
-                    rect[j].x = rand() % windowWidth;
-                    rect[j].y = rand() % windowWidth;
-                    rect[i].x = rand() % windowWidth;
-                    rect[i].y = rand() % windowWidth;
-                    initial_pos[j][0] = rect[j].x;
-                    initial_pos[j][1] = rect[j].y;
-                    initial_pos[i][0] = rect[i].x;
-                    initial_pos[i][1] = rect[i].y;
-
-
-
+                    // rect[j].x = rand() % windowWidth;
+                    // rect[j].y = rand() % windowWidth;
+                    // rect[i].x = rand() % windowWidth;
+                    // rect[i].y = rand() % windowWidth;
+                    // change the direction of the squares movement
+                    angular_velocities[j] = -angular_velocities[j];
+                    angular_velocities[i] = -angular_velocities[i];
+                    rect[i].x = initial_pos[i][0] + amplitudes[i][0] * cos(angular_velocities[i] * time_e+phi);
+                    rect[i].y = initial_pos[i][1] + amplitudes[i][1] * sin(angular_velocities[i] * time_e+phi);
                }
 
             }
             //use cosine function to move the rectangles
-            rect[j].x = initial_pos[j][0] + amplitudes[j] * cos(((2*M_PI)/periods[j])*time_e+phi);
-            rect[j].y = initial_pos[j][1] + amplitudes[j] * sin(((2*M_PI)/periods[j])*time_e+phi);
+            rect[j].x = initial_pos[j][0] + amplitudes[j][0] * cos(angular_velocities[j] * time_e+phi);
+            rect[j].y = initial_pos[j][1] + amplitudes[j][1] * sin(angular_velocities[j] * time_e+phi);
             //SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
             SDL_SetRenderDrawColor(rend, colors[j][0], colors[j][1], colors[j][2], 255);
             SDL_RenderFillRect(rend, &rect[j]);
@@ -131,7 +137,7 @@ int main(int argc, char *argv[])
         SDL_RenderPresent(rend);
         time_e += 0.01; // Increase the time elapsed
 
-        SDL_Delay(10); // Wait for a few milliseconds to slow down the animation
+        SDL_Delay(100); // Wait for a few milliseconds to slow down the animation
 
 
     }
