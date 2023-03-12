@@ -13,12 +13,12 @@
 
 int main(int argc, char *argv[])
 {
+    int N = 30;
+    if (argc > 1) {
+        N = atoi(argv[1]);
+    }
     int windowWidth = 640;
     int windowHeight = 480;
-
-    int phi = 10;
-    int N = 30;
-    bool game_is_running = true;
 
     // returns zero on success else non-zero
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -44,8 +44,6 @@ int main(int argc, char *argv[])
     float angle[N];
     int radius[N];
     int colors[N][3];
-    float velX = 100;
-    float velY = 0;
 
     for (int i = 0; i < N; i++) {
         positions[i][0] = (rand() %(windowWidth - 45 + 1)) + 45;
@@ -103,7 +101,6 @@ int main(int argc, char *argv[])
                 if (i != j) {
                     SDL_bool inter = SDL_HasIntersection(&rect[j], &rect[i]);
                     if (inter) {
-                        printf("collision detected, %d and %d\n", i, j);
                         angularSpeeds[i] *= -1;
                         angularSpeeds[j] *= -1;
                     }
