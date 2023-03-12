@@ -44,8 +44,6 @@ int main(int argc, char *argv[])
     float angle[N];
     int radius[N];
     int colors[N][3];
-    // float posX = windowWidth / 2;
-    // float posY = windowHeight / 2;
     float velX = 100;
     float velY = 0;
 
@@ -71,12 +69,6 @@ int main(int argc, char *argv[])
         angle[i] = rand() % 360;
         radius[i] = rand() % N;
     }
-
-    // Set ball radius
-    // float radius = 50;
-
-    // Set angle of circular movement
-    // float angularSpeed = 1;  // radians per second
 
     // Game loop
     Uint32 prevTicks = SDL_GetTicks();
@@ -112,60 +104,24 @@ int main(int argc, char *argv[])
                     SDL_bool inter = SDL_HasIntersection(&rect[j], &rect[i]);
                     if (inter) {
                         printf("collision detected, %d and %d\n", i, j);
-                        // change the direction of the ball if required by the collision
-                        // float temp = angularSpeeds[i];
-                        // angularSpeeds[i] = angularSpeeds[j];
-                        // angularSpeeds[j] = temp;
                         angularSpeeds[i] *= -1;
                         angularSpeeds[j] *= -1;
                     }
-                    // float dx = positions[i][0] - positions[j][0];
-                    // float dy = positions[i][1] - positions[j][1];
-                    // float distance = sqrt(dx * dx + dy * dy);
-                    // if (distance < 2 * radius) {
-                    //     // Swap velocities
-                    //     float temp = angularSpeeds[i];
-                    //     angularSpeeds[i] = angularSpeeds[j];
-                    //     angularSpeeds[j] = temp;
-                    // }
                 }
                 
             }
             // Update angle
             angle[i] += angularSpeeds[i] * deltaTime;
 
-            // Calculate new ball position
-            // positions[i][0] = positions[i][2] + radius * cos(angle[i]);
-            // positions[i][1] = positions[i][3] + radius * sin(angle[i]);
             rect[i].x = positions[i][2] + radius[i] * cos(angle[i]);
             rect[i].y = positions[i][3] + radius[i] * sin(angle[i]);
             // Draw ball
             SDL_SetRenderDrawColor(renderer, colors[i][0], colors[i][1], colors[i][2], 255);
-            // SDL_Rect ballRect = { (int)(positions[i][0] - radius), (int)(positions[i][1] - radius), (int)(2 * radius), (int)(2 * radius) };
             SDL_RenderFillRect(renderer, &rect[i]);
 
         }
         // Swap buffers
         SDL_RenderPresent(renderer);
-
-        // // Update angle
-        // angle += angularSpeed * deltaTime;
-
-        // // Calculate new ball position
-        // posX = windowWidth / 2 + radius * cos(angle);
-        // posY = windowHeight / 2 + radius * sin(angle);
-
-        // // Clear screen
-        // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        // SDL_RenderClear(renderer);
-
-        // // Draw ball
-        // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        // SDL_Rect ballRect = { (int)(posX - radius), (int)(posY - radius), (int)(2 * radius), (int)(2 * radius) };
-        // SDL_RenderFillRect(renderer, &ballRect);
-
-        // // Swap buffers
-        // SDL_RenderPresent(renderer);
     }
 
     // Cleanup
