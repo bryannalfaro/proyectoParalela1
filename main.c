@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     }
     int windowWidth = 640;
     int windowHeight = 480;
+    int frames = 0;
 
     // returns zero on success else non-zero
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -50,8 +51,9 @@ int main(int argc, char *argv[])
         positions[i][1] = (rand() %(windowHeight - 45 + 1)) + 45;
         rect[i].x = positions[i][0];
         rect[i].y = positions[i][1];
-        rect[i].w = 20;
-        rect[i].h = 20;
+        int size = rand() % 50 + 10;
+        rect[i].w = size;
+        rect[i].h = size;
         positions[i][2] = positions[i][0];
         positions[i][3] = positions[i][1];
         colors[i][0] = rand() % 255;
@@ -65,11 +67,12 @@ int main(int argc, char *argv[])
             angularSpeeds[i] = 1;
         }
         angle[i] = rand() % 360;
-        radius[i] = rand() % N;
+        radius[i] = rand() % N + size;
     }
 
     // Game loop
     Uint32 prevTicks = SDL_GetTicks();
+    Uint32 start = SDL_GetTicks();
     while (true) {
         // Handle events
         SDL_Event event;
@@ -90,12 +93,12 @@ int main(int argc, char *argv[])
     
         for (int i = 0; i < N; i++) {
             // check for collision with the walls
-            if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].w) {
-                angularSpeeds[i] *= -1;
-            }
-            if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].h) {
-                angularSpeeds[i] *= -1;
-            }
+            // if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].w) {
+            //     angularSpeeds[i] *= -1;
+            // }
+            // if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].h) {
+            //     angularSpeeds[i] *= -1;
+            // }
             for (int j = 0; j < N; j++) {
                 // Check for collision with other balls and swap velocities if collision occurs
                 if (i != j) {
@@ -119,6 +122,17 @@ int main(int argc, char *argv[])
         }
         // Swap buffers
         SDL_RenderPresent(renderer);
+
+        frames++;
+        Uint32 end = SDL_GetTicks();
+        Uint32 elapsed = end - start;
+
+        if (elapsed >= 1000) {
+            double fps = frames / (elapsed / 1000.0);
+            printf("FPS: %f\n", fps);
+            frames = 0; 
+            start = end;
+        }
     }
 
     // Cleanup
