@@ -1,6 +1,7 @@
 //TODO
-//cambiar amplitudes y periodos
-//choques cambian movimiento y particiona
+// que no nazca montado
+// revisar que no este muy cerca del edge
+// que no detectar que los choques no se hagan dos veces
 #include <SDL2/SDL.h>
 // #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
@@ -93,12 +94,12 @@ int main(int argc, char *argv[])
     
         for (int i = 0; i < N; i++) {
             // check for collision with the walls
-            // if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].w) {
-            //     angularSpeeds[i] *= -1;
-            // }
-            // if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].h) {
-            //     angularSpeeds[i] *= -1;
-            // }
+            if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].w) {
+                angularSpeeds[i] *= -1;
+            }
+            if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].h) {
+                angularSpeeds[i] *= -1;
+            }
             for (int j = 0; j < N; j++) {
                 // Check for collision with other balls and swap velocities if collision occurs
                 if (i != j) {
