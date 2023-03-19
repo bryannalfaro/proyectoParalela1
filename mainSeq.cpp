@@ -1,7 +1,15 @@
-// TODO
-//  que no nazca montado
-//  revisar que no este muy cerca del edge
-//  que no detectar que los choques no se hagan dos veces
+/**
+ * @file main.cpp
+ * @author Raul Jimenez
+ * @author Bryann Alfaro
+ * @author Donaldo Garcia
+ * @brief Main file of the project that has the screen saver simulation secuential.
+ * @version 0.1
+ * @date 2023-03-22
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -10,11 +18,14 @@
 #include <ctime>
 #include <cmath>
 #include<iostream>
-// #include "square.h"
 
 #define triesNum 10
 #define maxRadius 20
 
+/**
+ * @brief Struct to represent a square
+ * 
+ */
 struct Square
 {
     int x;            // x-coordinate of top left corner
@@ -30,17 +41,22 @@ struct Square
 };
 
 // Generate a random square within the bounds of the window
+/**
+ * @brief Generate a random square within the bounds of the window
+ * 
+ * @param window window that stores the sizes of the simulation type SDL_Window
+ * @return Square new square to be added to the simulation type Square
+ */
 Square generate_random_square(SDL_Window *window)
 {
     Square square;
     int size = (rand() % 45) + 5;
     int winWidth, winHeight;
     SDL_GetWindowSize(window, &winWidth, &winHeight);
-    square.x = (rand() % (winWidth - size * 2)) + size;  // Subtract 50 to ensure the square fits within the window
-    square.y = (rand() % (winHeight - size * 2)) + size; // Subtract 50 to ensure the square fits within the window
+    square.x = (rand() % (winWidth - size * 2)) + size;  // module of window minues size times 2 plus the size to ensure the square fits within the window 
+    square.y = (rand() % (winHeight - size * 2)) + size; // module of window minues size times 2 plus the size to ensure the square fits within the window 
     square.initialX = square.x;
     square.initialY = square.y;
-    // square.width = rand() % (winWidth - square.x);
     square.angle = rand() % 360;
     // set initial angular speed randomly as 1 or -1
     int x = rand() % 2;
@@ -62,7 +78,14 @@ Square generate_random_square(SDL_Window *window)
     return square;
 }
 
-// Check boxes colliding
+/**
+ * @brief Check if two squares are colliding
+ * 
+ * @param s1 Square 1 type Square
+ * @param s2  Square 2 type Square
+ * @return true if colliding
+ * @return false if not colliding
+ */
 bool check_collision(Square s1, Square s2)
 {
     // Calculate the x- and y-coordinates of the bounding boxes
@@ -86,8 +109,10 @@ bool check_collision(Square s1, Square s2)
 using namespace std;
 int main(int argc, char *argv[])
 {
+    // Seed the random number generator
     srand((unsigned int)time(NULL));
     int N = 30;
+    // Get the number of squares from the command line
     if (argc > 1)
     {
         // validate if the argument is a number
@@ -98,8 +123,10 @@ int main(int argc, char *argv[])
         }
         N = atoi(argv[1]);
     }
+    // Window dimensions
     int windowWidth = 640;
     int windowHeight = 480;
+    // frames for fps
     int frames = 0;
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -118,9 +145,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // create an array of N  rectangles
+    // create an array of N squares
     Square rect[N];
 
+    // Generate N random squares
     for (int i = 0; i < N; i++)
     {
         Square square;
@@ -128,26 +156,24 @@ int main(int argc, char *argv[])
 
         int numberOfTries = 0;
         int j = 0;
-
+        // Check if the square collides with any of the previous squares
         while (j < N && numberOfTries < triesNum)
         {
             Square previous_square = rect[j];
 
             if (check_collision(square, previous_square))
             {
+                // If the square collides with a previous square then generate a new square
                 square = generate_random_square(window);
                 numberOfTries++;
                 j = -1;
-                // printf("trueeeeee %d, %d, actual %d,%d,%d,%d prev %d,%d,%d,%d \n", j, i, square.color.r, square.color.g, square.color.b, square.color.a,  previous_square.color.r, previous_square.color.g, previous_square.color.b, previous_square.color.a);
-                // printf("prev (%d, %d, %d) actual (%d, %d, %d)\n", previous_square.x, previous_square.y, previous_square.width, square.x, square.y, square.width);
             }
             j++;
         }
 
-        // If there was not a match then remove the square
+        // If there was not a match then remove the square (set x and y to -1 and size to 0)
         if (numberOfTries >= triesNum)
         {
-            // printf("position %d\n", numberOfTries);
             square.x = -1;
             square.y = -1;
             square.width = 0;
@@ -210,10 +236,9 @@ int main(int argc, char *argv[])
                 }
             }
             // Update angle
-            //cout << "speed " << rect[i].angularSpeed << " angle " << rect[i].angle << " deltaTime " << deltaTime << "calc"<<rect[i].angularSpeed * deltaTime<<endl;
             rect[i].angle = rect[i].angle + (rect[i].angularSpeed * deltaTime);
-            //cout<<"ANGLE"<<rect[i].angle <<endl;
 
+            // Update position
             rect[i].x = rect[i].initialX + rect[i].radius * cos(rect[i].angle);
             rect[i].y = rect[i].initialY + rect[i].radius * sin(rect[i].angle);
 
@@ -226,6 +251,7 @@ int main(int argc, char *argv[])
         // Swap buffers
         SDL_RenderPresent(renderer);
 
+        // FPS
         frames++;
         Uint32 end = SDL_GetTicks();
         Uint32 elapsed = end - start;
@@ -233,7 +259,7 @@ int main(int argc, char *argv[])
         if (elapsed >= 1000)
         {
             double fps = frames / (elapsed / 1000.0);
-            // printf("FPS: %f\n", fps);
+            printf("FPS: %f\n", fps);
             frames = 0;
             start = end;
         }
