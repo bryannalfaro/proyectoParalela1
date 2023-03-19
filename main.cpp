@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include<iostream>
 // #include "square.h"
 
 #define triesNum 10
@@ -22,9 +23,9 @@ struct Square
     int initialY;     // Initial pos Y
     int width;        // width of square
     int height;       // height of square
-    int angle;        // Angle
+    float angle;        // Angle
     int radius;       // Radius
-    int angularSpeed; // Angular speed
+    float angularSpeed; // Angular speed
     SDL_Color color;  // Color
 };
 
@@ -44,11 +45,11 @@ Square generate_random_square(SDL_Window *window)
     int x = rand() % 2;
     if (x == 0)
     {
-        square.angularSpeed = -1;
+        square.angularSpeed = -2;
     }
     else
     {
-        square.angularSpeed = 1;
+        square.angularSpeed = 2;
     }
     square.radius = rand() % maxRadius;
     square.width = (rand() % 45) + 5;
@@ -81,6 +82,7 @@ bool check_collision(Square s1, Square s2)
     return false; // Squares are not colliding
 }
 
+using namespace std;
 int main(int argc, char *argv[])
 {
     srand((unsigned int)time(NULL));
@@ -176,33 +178,34 @@ int main(int argc, char *argv[])
 
         for (int i = 0; i < N; i++)
         {
-            // check for collision with the walls
-            // if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].width)
-            // {
-            //     rect[i].angularSpeed *= -1;
-            // }
-            // if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].height)
-            // {
-            //     rect[i].angularSpeed *= -1;
-            // }
-            // for (int j = 0; j < N; j++)
-            // {
-            //     // Check for collision with other balls and swap velocities if collision occurs
-            //     if (i != j)
-            //     {
-            //         SDL_Rect rectangle1 = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
-            //         SDL_Rect rectangle2 = {rect[j].x, rect[j].y, rect[j].width, rect[j].height};
-            //         SDL_bool inter = SDL_HasIntersection(&rectangle1, &rectangle2);
-            //         if (inter)
-            //         {
-            //             rect[i].angularSpeed *= -1;
-            //             rect[j].angularSpeed *= -1;
-            //         }
-            //     }
-            // }
+            //check for collision with the walls
+            if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].width)
+            {
+                rect[i].angularSpeed *= -1;
+            }
+            if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].height)
+            {
+                rect[i].angularSpeed *= -1;
+            }
+            for (int j = 0; j < N; j++)
+            {
+                // Check for collision with other balls and swap velocities if collision occurs
+                if (i != j)
+                {
+                    SDL_Rect rectangle1 = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
+                    SDL_Rect rectangle2 = {rect[j].x, rect[j].y, rect[j].width, rect[j].height};
+                    SDL_bool inter = SDL_HasIntersection(&rectangle1, &rectangle2);
+                    if (inter)
+                    {
+                        rect[i].angularSpeed *= -1;
+                        rect[j].angularSpeed *= -1;
+                    }
+                }
+            }
             // Update angle
-            printf("delta time: %d %d %d %d %\n", rect[i].initialX, rect[i].x, rect[i].angle, rect[i].angularSpeed);
-            rect[i].angle += rect[i].angularSpeed * deltaTime;
+            //cout << "speed " << rect[i].angularSpeed << " angle " << rect[i].angle << " deltaTime " << deltaTime << "calc"<<rect[i].angularSpeed * deltaTime<<endl;
+            rect[i].angle = rect[i].angle + (rect[i].angularSpeed * deltaTime);
+            //cout<<"ANGLE"<<rect[i].angle <<endl;
 
             rect[i].x = rect[i].initialX + rect[i].radius * cos(rect[i].angle);
             rect[i].y = rect[i].initialY + rect[i].radius * sin(rect[i].angle);
