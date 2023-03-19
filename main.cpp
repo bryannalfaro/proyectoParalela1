@@ -33,10 +33,11 @@ struct Square
 Square generate_random_square(SDL_Window *window)
 {
     Square square;
+    int size = (rand() % 45) + 5;
     int winWidth, winHeight;
     SDL_GetWindowSize(window, &winWidth, &winHeight);
-    square.x = rand() % (winWidth - 50);  // Subtract 50 to ensure the square fits within the window
-    square.y = rand() % (winHeight - 50); // Subtract 50 to ensure the square fits within the window
+    square.x = (rand() % (winWidth - size * 2)) + size;  // Subtract 50 to ensure the square fits within the window
+    square.y = (rand() % (winHeight - size * 2)) + size; // Subtract 50 to ensure the square fits within the window
     square.initialX = square.x;
     square.initialY = square.y;
     // square.width = rand() % (winWidth - square.x);
@@ -52,7 +53,7 @@ Square generate_random_square(SDL_Window *window)
         square.angularSpeed = 2;
     }
     square.radius = rand() % maxRadius;
-    square.width = (rand() % 45) + 5;
+    square.width = size;
     square.height = square.width;
     square.color = {static_cast<unsigned char>(rand() % 256),
                     static_cast<unsigned char>(rand() % 256),
