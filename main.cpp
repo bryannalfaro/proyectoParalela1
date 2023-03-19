@@ -4,27 +4,28 @@
 //  que no detectar que los choques no se hagan dos veces
 #include <iostream>
 #include <SDL2/SDL.h>
-// #include "square.h"
-// #include "utils.cpp"
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <iostream>
-#include <stdio.h>
-#include <SDL2/SDL.h>
 // #include "square.h"
 
 #define triesNum 10
+#define maxRadius 20
 
 struct Square
 {
-    int x;           // x-coordinate of top left corner
-    int y;           // y-coordinate of top left corner
-    int width;       // width of square
-    int height;      // height of square
-    SDL_Color color; // Color
+    int x;            // x-coordinate of top left corner
+    int y;            // y-coordinate of top left corner
+    int initialX;     // Initial pos X
+    int initialY;     // Initial pos Y
+    int width;        // width of square
+    int height;       // height of square
+    int angle;        // Angle
+    int radius;       // Radius
+    int angularSpeed; // Angular speed
+    SDL_Color color;  // Color
 };
 
 // Generate a random square within the bounds of the window
@@ -35,7 +36,21 @@ Square generate_random_square(SDL_Window *window)
     SDL_GetWindowSize(window, &winWidth, &winHeight);
     square.x = rand() % (winWidth - 50);  // Subtract 50 to ensure the square fits within the window
     square.y = rand() % (winHeight - 50); // Subtract 50 to ensure the square fits within the window
+    square.initialX = square.x;
+    square.initialY = square.y;
     // square.width = rand() % (winWidth - square.x);
+    square.angle = rand() % 360;
+    // set initial angular speed randomly as 1 or -1
+    int x = rand() % 2;
+    if (x == 0)
+    {
+        square.angularSpeed = -1;
+    }
+    else
+    {
+        square.angularSpeed = 1;
+    }
+    square.radius = rand() % maxRadius;
     square.width = (rand() % 45) + 5;
     square.height = square.width;
     square.color = {static_cast<unsigned char>(rand() % 256),
@@ -153,8 +168,46 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        // Calculate delta time
+        Uint32 currentTicks = SDL_GetTicks();
+        float deltaTime = (currentTicks - prevTicks) / 1000.0f;
+        prevTicks = currentTicks;
+        // --------------------
+
         for (int i = 0; i < N; i++)
         {
+            // check for collision with the walls
+            // if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].width)
+            // {
+            //     rect[i].angularSpeed *= -1;
+            // }
+            // if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].height)
+            // {
+            //     rect[i].angularSpeed *= -1;
+            // }
+            // for (int j = 0; j < N; j++)
+            // {
+            //     // Check for collision with other balls and swap velocities if collision occurs
+            //     if (i != j)
+            //     {
+            //         SDL_Rect rectangle1 = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
+            //         SDL_Rect rectangle2 = {rect[j].x, rect[j].y, rect[j].width, rect[j].height};
+            //         SDL_bool inter = SDL_HasIntersection(&rectangle1, &rectangle2);
+            //         if (inter)
+            //         {
+            //             rect[i].angularSpeed *= -1;
+            //             rect[j].angularSpeed *= -1;
+            //         }
+            //     }
+            // }
+            // Update angle
+            printf("delta time: %d %d %d %d %\n", rect[i].initialX, rect[i].x, rect[i].angle, rect[i].angularSpeed);
+            rect[i].angle += rect[i].angularSpeed * deltaTime;
+
+            rect[i].x = rect[i].initialX + rect[i].radius * cos(rect[i].angle);
+            rect[i].y = rect[i].initialY + rect[i].radius * sin(rect[i].angle);
+
+            // Draw ball
             SDL_SetRenderDrawColor(renderer, rect[i].color.r, rect[i].color.g, rect[i].color.b, rect[i].color.a);
             SDL_Rect rectangle = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
             SDL_RenderFillRect(renderer, &rectangle);
