@@ -18,6 +18,7 @@
 #include <ctime>
 #include <cmath>
 #include<iostream>
+#include <omp.h>
 using namespace std;
 
 #define numberOfTriesAllow 10
@@ -147,6 +148,8 @@ int main(int argc, char *argv[])
 
     // create an array of N squares
     Square squaresArray[numberSquares];
+    // time to calculate speedup
+    double timeInit = omp_get_wtime();
 
     // Generate N random squares
     for (int i = 0; i < numberSquares; i++)
@@ -187,6 +190,7 @@ int main(int argc, char *argv[])
     // Game loop
     Uint32 prevTicks = SDL_GetTicks();
     Uint32 start = SDL_GetTicks();
+    bool firstTime = true;
     while (true)
     {
         // Handle events
@@ -263,6 +267,13 @@ int main(int argc, char *argv[])
             frames = 0;
             start = end;
         }
+        if (firstTime)
+        {
+            double t_fin = omp_get_wtime();
+            double delta = t_fin - timeInit;
+            cout << "Sequential program took " << delta << " seconds" << endl;
+        }
+        firstTime = false;
     }
     // Cleanup
     SDL_DestroyRenderer(renderer);
