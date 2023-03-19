@@ -18,9 +18,10 @@
 #include <ctime>
 #include <cmath>
 #include<iostream>
+using namespace std;
 
-#define triesNum 10
-#define maxRadius 20
+#define numberOfTriesAllow 10
+#define maxRadiusMCU 20
 
 /**
  * @brief Struct to represent a square
@@ -47,7 +48,7 @@ struct Square
  * @param window window that stores the sizes of the simulation type SDL_Window
  * @return Square new square to be added to the simulation type Square
  */
-Square generate_random_square(SDL_Window *window)
+Square generateRandomSquare(SDL_Window *window)
 {
     Square square;
     int size = (rand() % 45) + 5;
@@ -68,7 +69,7 @@ Square generate_random_square(SDL_Window *window)
     {
         square.angularSpeed = 2;
     }
-    square.radius = rand() % maxRadius;
+    square.radius = rand() % maxRadiusMCU;
     square.width = size;
     square.height = square.width;
     square.color = {static_cast<unsigned char>(rand() % 256),
@@ -81,37 +82,36 @@ Square generate_random_square(SDL_Window *window)
 /**
  * @brief Check if two squares are colliding
  * 
- * @param s1 Square 1 type Square
- * @param s2  Square 2 type Square
+ * @param square1 Square 1 type Square
+ * @param square2  Square 2 type Square
  * @return true if colliding
  * @return false if not colliding
  */
-bool check_collision(Square s1, Square s2)
+bool checkCollision(Square square1, Square square2)
 {
     // Calculate the x- and y-coordinates of the bounding boxes
-    int s1_x1 = s1.x;
-    int s1_x2 = s1.x + s1.width;
-    int s1_y1 = s1.y;
-    int s1_y2 = s1.y + s1.height;
-    int s2_x1 = s2.x;
-    int s2_x2 = s2.x + s2.width;
-    int s2_y1 = s2.y;
-    int s2_y2 = s2.y + s2.height;
+    int square1_x1 = square1.x;
+    int square1_x2 = square1.x + square1.width;
+    int square1_y1 = square1.y;
+    int square1_y2 = square1.y + square1.height;
+    int square2_x1 = square2.x;
+    int square2_x2 = square2.x + square2.width;
+    int square2_y1 = square2.y;
+    int square2_y2 = square2.y + square2.height;
 
     // Check if the bounding boxes overlap in both x- and y-coordinates
-    if (s1_x1 < s2_x2 && s1_x2 > s2_x1 && s1_y1 < s2_y2 && s1_y2 > s2_y1)
+    if (square1_x1 < square2_x2 && square1_x2 > square2_x1 && square1_y1 < square2_y2 && square1_y2 > square2_y1)
     {
         return true; // Squares are colliding
     }
     return false; // Squares are not colliding
 }
 
-using namespace std;
 int main(int argc, char *argv[])
 {
     // Seed the random number generator
     srand((unsigned int)time(NULL));
-    int N = 30;
+    int numberSquares = 30;
     // Get the number of squares from the command line
     if (argc > 1)
     {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
             printf("The argument must be a number\n");
             return 1;
         }
-        N = atoi(argv[1]);
+        numberSquares = atoi(argv[1]);
     }
     // Window dimensions
     int windowWidth = 640;
@@ -146,25 +146,25 @@ int main(int argc, char *argv[])
     }
 
     // create an array of N squares
-    Square rect[N];
+    Square squaresArray[numberSquares];
 
     // Generate N random squares
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < numberSquares; i++)
     {
         Square square;
-        square = generate_random_square(window);
+        square = generateRandomSquare(window);
 
         int numberOfTries = 0;
         int j = 0;
         // Check if the square collides with any of the previous squares
-        while (j < N && numberOfTries < triesNum)
+        while (j < numberSquares && numberOfTries < numberOfTriesAllow)
         {
-            Square previous_square = rect[j];
+            Square previousSquare = squaresArray[j];
 
-            if (check_collision(square, previous_square))
+            if (checkCollision(square, previousSquare))
             {
                 // If the square collides with a previous square then generate a new square
-                square = generate_random_square(window);
+                square = generateRandomSquare(window);
                 numberOfTries++;
                 j = -1;
             }
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
         }
 
         // If there was not a match then remove the square (set x and y to -1 and size to 0)
-        if (numberOfTries >= triesNum)
+        if (numberOfTries >= numberOfTriesAllow)
         {
             square.x = -1;
             square.y = -1;
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
         }
 
         // Add square
-        rect[i] = square;
+        squaresArray[i] = square;
     }
 
     // Game loop
@@ -209,42 +209,42 @@ int main(int argc, char *argv[])
         prevTicks = currentTicks;
         // --------------------
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < numberSquares; i++)
         {
             //check for collision with the walls
-            if (rect[i].x < 0 || rect[i].x > windowWidth - rect[i].width)
+            if (squaresArray[i].x < 0 || squaresArray[i].x > windowWidth - squaresArray[i].width)
             {
-                rect[i].angularSpeed *= -1;
+                squaresArray[i].angularSpeed *= -1;
             }
-            if (rect[i].y < 0 || rect[i].y > windowHeight - rect[i].height)
+            if (squaresArray[i].y < 0 || squaresArray[i].y > windowHeight - squaresArray[i].height)
             {
-                rect[i].angularSpeed *= -1;
+                squaresArray[i].angularSpeed *= -1;
             }
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j < numberSquares; j++)
             {
                 // Check for collision with other balls and swap velocities if collision occurs
                 if (i != j)
                 {
-                    SDL_Rect rectangle1 = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
-                    SDL_Rect rectangle2 = {rect[j].x, rect[j].y, rect[j].width, rect[j].height};
-                    SDL_bool inter = SDL_HasIntersection(&rectangle1, &rectangle2);
-                    if (inter)
+                    SDL_Rect rectangle1 = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
+                    SDL_Rect rectangle2 = {squaresArray[j].x, squaresArray[j].y, squaresArray[j].width, squaresArray[j].height};
+                    SDL_bool hasIntersection = SDL_HasIntersection(&rectangle1, &rectangle2);
+                    if (hasIntersection)
                     {
-                        rect[i].angularSpeed *= -1;
-                        rect[j].angularSpeed *= -1;
+                        squaresArray[i].angularSpeed *= -1;
+                        squaresArray[j].angularSpeed *= -1;
                     }
                 }
             }
             // Update angle
-            rect[i].angle = rect[i].angle + (rect[i].angularSpeed * deltaTime);
+            squaresArray[i].angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
 
             // Update position
-            rect[i].x = rect[i].initialX + rect[i].radius * cos(rect[i].angle);
-            rect[i].y = rect[i].initialY + rect[i].radius * sin(rect[i].angle);
+            squaresArray[i].x = squaresArray[i].initialX + squaresArray[i].radius * cos(squaresArray[i].angle);
+            squaresArray[i].y = squaresArray[i].initialY + squaresArray[i].radius * sin(squaresArray[i].angle);
 
             // Draw ball
-            SDL_SetRenderDrawColor(renderer, rect[i].color.r, rect[i].color.g, rect[i].color.b, rect[i].color.a);
-            SDL_Rect rectangle = {rect[i].x, rect[i].y, rect[i].width, rect[i].height};
+            SDL_SetRenderDrawColor(renderer, squaresArray[i].color.r, squaresArray[i].color.g, squaresArray[i].color.b, squaresArray[i].color.a);
+            SDL_Rect rectangle = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
             SDL_RenderFillRect(renderer, &rectangle);
         }
 
