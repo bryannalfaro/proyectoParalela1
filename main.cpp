@@ -90,6 +90,12 @@ int main(int argc, char *argv[])
     int N = 30;
     if (argc > 1)
     {
+        // validate if the argument is a number
+        if (atoi(argv[1]) == 0)
+        {
+            printf("The argument must be a number\n");
+            return 1;
+        }
         N = atoi(argv[1]);
     }
     int windowWidth = 640;
