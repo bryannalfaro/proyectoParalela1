@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
     {
       double t_fin = omp_get_wtime();
       double delta = t_fin - timeInit;
-      cout << "Sequential program took " << delta << " seconds" << endl;
+      cout << "Parallela version 1 took " << delta << " seconds" << endl;
     }
     firstTime = false;
   }
