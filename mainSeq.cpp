@@ -6,9 +6,9 @@
  * @brief Main file of the project that has the screen saver simulation secuential.
  * @version 0.1
  * @date 2023-03-22
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include <iostream>
 #include <SDL2/SDL.h>
@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include<iostream>
+#include <iostream>
 #include <omp.h>
 using namespace std;
 
@@ -26,26 +26,26 @@ using namespace std;
 
 /**
  * @brief Struct to represent a square
- * 
+ *
  */
 struct Square
 {
-    int x;            // x-coordinate of top left corner
-    int y;            // y-coordinate of top left corner
-    int initialX;     // Initial pos X
-    int initialY;     // Initial pos Y
-    int width;        // width of square
-    int height;       // height of square
+    int x;              // x-coordinate of top left corner
+    int y;              // y-coordinate of top left corner
+    int initialX;       // Initial pos X
+    int initialY;       // Initial pos Y
+    int width;          // width of square
+    int height;         // height of square
     float angle;        // Angle
-    int radius;       // Radius
+    int radius;         // Radius
     float angularSpeed; // Angular speed
-    SDL_Color color;  // Color
+    SDL_Color color;    // Color
 };
 
 // Generate a random square within the bounds of the window
 /**
  * @brief Generate a random square within the bounds of the window
- * 
+ *
  * @param window window that stores the sizes of the simulation type SDL_Window
  * @return Square new square to be added to the simulation type Square
  */
@@ -55,8 +55,8 @@ Square generateRandomSquare(SDL_Window *window)
     int size = (rand() % 45) + 5;
     int winWidth, winHeight;
     SDL_GetWindowSize(window, &winWidth, &winHeight);
-    square.x = (rand() % (winWidth - size * 2)) + size;  // module of window minues size times 2 plus the size to ensure the square fits within the window 
-    square.y = (rand() % (winHeight - size * 2)) + size; // module of window minues size times 2 plus the size to ensure the square fits within the window 
+    square.x = (rand() % (winWidth - size * 2)) + size;  // module of window minues size times 2 plus the size to ensure the square fits within the window
+    square.y = (rand() % (winHeight - size * 2)) + size; // module of window minues size times 2 plus the size to ensure the square fits within the window
     square.initialX = square.x;
     square.initialY = square.y;
     square.angle = rand() % 360;
@@ -70,7 +70,7 @@ Square generateRandomSquare(SDL_Window *window)
     {
         square.angularSpeed = 2;
     }
-    square.radius = rand() % maxRadiusMCU;
+    square.radius = rand() % maxRadiusMCU +5;
     square.width = size;
     square.height = square.width;
     square.color = {static_cast<unsigned char>(rand() % 256),
@@ -82,7 +82,7 @@ Square generateRandomSquare(SDL_Window *window)
 
 /**
  * @brief Check if two squares are colliding
- * 
+ *
  * @param square1 Square 1 type Square
  * @param square2  Square 2 type Square
  * @return true if colliding
@@ -212,45 +212,95 @@ int main(int argc, char *argv[])
         float deltaTime = (currentTicks - prevTicks) / 1000.0f;
         prevTicks = currentTicks;
         // --------------------
-
-        for (int i = 0; i < numberSquares; i++)
-        {
-            //check for collision with the walls
-            if (squaresArray[i].x < 0 || squaresArray[i].x > windowWidth - squaresArray[i].width)
+        // if (!firstTime)
+        // {
+            for (int i = 0; i < numberSquares; i++)
             {
-                squaresArray[i].angularSpeed *= -1;
-            }
-            if (squaresArray[i].y < 0 || squaresArray[i].y > windowHeight - squaresArray[i].height)
-            {
-                squaresArray[i].angularSpeed *= -1;
-            }
-            for (int j = 0; j < numberSquares; j++)
-            {
-                // Check for collision with other balls and swap velocities if collision occurs
-                if (i != j)
+                // check for collision with the walls
+                if (squaresArray[i].x < 0 || squaresArray[i].x > windowWidth - squaresArray[i].width)
                 {
-                    SDL_Rect rectangle1 = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
-                    SDL_Rect rectangle2 = {squaresArray[j].x, squaresArray[j].y, squaresArray[j].width, squaresArray[j].height};
-                    SDL_bool hasIntersection = SDL_HasIntersection(&rectangle1, &rectangle2);
-                    if (hasIntersection)
+                    squaresArray[i].angularSpeed *= -1;
+                }
+                if (squaresArray[i].y < 0 || squaresArray[i].y > windowHeight - squaresArray[i].height)
+                {
+                    squaresArray[i].angularSpeed *= -1;
+                }
+                for (int j = 0; j < numberSquares; j++)
+                {
+                    // Check for collision with other balls and swap velocities if collision occurs
+                    if (i != j)
                     {
-                        squaresArray[i].angularSpeed *= -1;
-                        squaresArray[j].angularSpeed *= -1;
+                        // SDL_Rect rectangle1 = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
+                        // SDL_Rect rectangle2 = {squaresArray[j].x, squaresArray[j].y, squaresArray[j].width, squaresArray[j].height};
+                        // SDL_bool hasIntersection = SDL_HasIntersection(&rectangle1, &rectangle2);
+
+                        // next pos i
+                        // Update angle
+                        float i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
+
+                        // Update position
+                        int i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(i_angle);
+                        int i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(i_angle);
+
+                        // next pos j
+                        // Update angle
+                        float j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime);
+
+                        // Update position
+                        int j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(j_angle);
+                        int j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(j_angle);
+
+                        SDL_Rect rectanglei = {i_x, i_y, squaresArray[i].width, squaresArray[i].height};
+                        SDL_Rect rectanglej = {j_x, j_y, squaresArray[j].width, squaresArray[j].height};
+                        SDL_bool hasIntersection_next = SDL_HasIntersection(&rectanglei, &rectanglej);
+
+                        // other pos i
+                        // Update angle
+                        float other_i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime * (-1));
+
+                        // Update position
+                        int other_i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(other_i_angle);
+                        int other_i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(other_i_angle);
+
+                        // other pos j
+                        // Update angle
+                        float other_j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime * (-1));
+
+                        // Update position
+                        int other_j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(other_j_angle);
+                        int other_j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(other_j_angle);
+
+                        SDL_Rect otherrectanglei = {other_i_x, other_i_y, squaresArray[i].width, squaresArray[i].height};
+                        SDL_Rect otherrectanglej = {other_j_x, other_j_y, squaresArray[j].width, squaresArray[j].height};
+                        SDL_bool otherhasIntersection_next = SDL_HasIntersection(&rectanglei, &rectanglej);
+
+                        if (hasIntersection_next && otherhasIntersection_next)
+                        {
+                            squaresArray[i].angularSpeed = 0;
+                            // squaresArray[j].angularSpeed *= -1;
+                        } else if (hasIntersection_next) {
+                            squaresArray[i].angularSpeed *= -1;
+                        }
                     }
                 }
             }
-            // Update angle
-            squaresArray[i].angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
 
-            // Update position
-            squaresArray[i].x = squaresArray[i].initialX + squaresArray[i].radius * cos(squaresArray[i].angle);
-            squaresArray[i].y = squaresArray[i].initialY + squaresArray[i].radius * sin(squaresArray[i].angle);
+            // update the values
+            for (int i = 0; i < numberSquares; i++)
+            {
+                // Update angle
+                squaresArray[i].angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
 
-            // Draw ball
-            SDL_SetRenderDrawColor(renderer, squaresArray[i].color.r, squaresArray[i].color.g, squaresArray[i].color.b, squaresArray[i].color.a);
-            SDL_Rect rectangle = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
-            SDL_RenderFillRect(renderer, &rectangle);
-        }
+                // Update position
+                squaresArray[i].x = squaresArray[i].initialX + squaresArray[i].radius * cos(squaresArray[i].angle);
+                squaresArray[i].y = squaresArray[i].initialY + squaresArray[i].radius * sin(squaresArray[i].angle);
+
+                // Draw ball
+                SDL_SetRenderDrawColor(renderer, squaresArray[i].color.r, squaresArray[i].color.g, squaresArray[i].color.b, squaresArray[i].color.a);
+                SDL_Rect rectangle = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
+                SDL_RenderFillRect(renderer, &rectangle);
+            }
+        // }
 
         // Swap buffers
         SDL_RenderPresent(renderer);
