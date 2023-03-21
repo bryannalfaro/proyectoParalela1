@@ -229,10 +229,6 @@ int main(int argc, char *argv[])
                 // Check for collision with other balls and swap velocities if collision occurs
                 if (i != j)
                 {
-                    // SDL_Rect rectangle1 = {squaresArray[i].x, squaresArray[i].y, squaresArray[i].width, squaresArray[i].height};
-                    // SDL_Rect rectangle2 = {squaresArray[j].x, squaresArray[j].y, squaresArray[j].width, squaresArray[j].height};
-                    // SDL_bool hasIntersection = SDL_HasIntersection(&rectangle1, &rectangle2);
-
                     // next pos i
                     // Update angle
                     float i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
@@ -275,11 +271,9 @@ int main(int argc, char *argv[])
 
                     if (hasIntersection_next && otherhasIntersection_next)
                     {
-                        // squaresArray[i].angularSpeed = 0;
                         squaresArray[i].width = squaresArray[i].width / 2;
                         squaresArray[i].height = squaresArray[i].height / 2;
                         cout << "COLLISION EVERYWHERE" << endl;
-                        // squaresArray[j].angularSpeed *= -1;
                     }
                     else if (hasIntersection_next)
                     {
