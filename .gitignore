@@ -3,3 +3,6 @@
 .vscode
 include
 lib
+mainSeq
+mainPar
+.DS_Store
