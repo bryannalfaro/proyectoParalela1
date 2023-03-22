@@ -267,24 +267,11 @@ int main(int argc, char *argv[])
                 if (i != j)
                 {
                     // next pos i
-                    // // Update angle
-                    // float i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
-
-                    // // Update position
-                    // int i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(i_angle);
-                    // int i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(i_angle);
                     NextPos nextPosI = getNextPosition(squaresArray[i], deltaTime);
                     int i_x = nextPosI.x;
                     int i_y = nextPosI.y;
 
                     // next pos j
-                    // Update angle
-                    // float j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime);
-
-                    // // Update position
-                    // int j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(j_angle);
-                    // int j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(j_angle);
-
                     NextPos nextPosJ = getNextPosition(squaresArray[j], deltaTime);
                     int j_x = nextPosJ.x;
                     int j_y = nextPosJ.y;
@@ -294,23 +281,11 @@ int main(int argc, char *argv[])
                     SDL_bool hasIntersection_next = SDL_HasIntersection(&rectanglei, &rectanglej);
 
                     // other pos i
-                    // Update angle
-                    // float other_i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime * (-1));
-
-                    // // Update position
-                    // int other_i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(other_i_angle);
-                    // int other_i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(other_i_angle);
                     NextPos otherNextPosI = getNextPosition(squaresArray[i], deltaTime * (-1));
                     int other_i_x = otherNextPosI.x;
                     int other_i_y = otherNextPosI.y;
 
                     // other pos j
-                    // Update angle
-                    // float other_j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime * (-1));
-
-                    // // Update position
-                    // int other_j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(other_j_angle);
-                    // int other_j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(other_j_angle);
                     NextPos otherNextPosJ = getNextPosition(squaresArray[j], deltaTime * (-1));
                     int other_j_x = otherNextPosJ.x;
                     int other_j_y = otherNextPosJ.y;
@@ -335,12 +310,6 @@ int main(int argc, char *argv[])
         // update the values
         for (int i = 0; i < numberSquares; i++)
         {
-            // // Update angle
-            // squaresArray[i].angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
-
-            // // Update position
-            // squaresArray[i].x = squaresArray[i].initialX + squaresArray[i].radius * cos(squaresArray[i].angle);
-            // squaresArray[i].y = squaresArray[i].initialY + squaresArray[i].radius * sin(squaresArray[i].angle);
             NextPos nextPositionSquare = getNextPosition(squaresArray[i], deltaTime);
             squaresArray[i].x = nextPositionSquare.x;
             squaresArray[i].y = nextPositionSquare.y;
