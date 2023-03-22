@@ -44,16 +44,15 @@ struct Square
     SDL_Color color;    // Color
 };
 
-// TODO agregar al doc
 /**
  * @brief Struct to represent the next position of the square
  * 
  */
 struct NextPos
 {
-    float angle;
-    int x;
-    int y;
+    float angle; // Angle
+    int x;       // x-coordinate of top left corner
+    int y;       // y-coordinate of top left corner
 };
 
 // Generate a random square within the bounds of the window
@@ -122,7 +121,13 @@ bool checkCollision(Square square1, Square square2)
     return false; // Squares are not colliding
 }
 
-// TODO pasar al doc
+/**
+ * @brief Get the Next Position object
+ * 
+ * @param square1 Square 1 type Square
+ * @param deltaTime float time between frames
+ * @return NextPos with the next position of the square
+ */
 NextPos getNextPosition(Square square1, float deltaTime)
 {
     float i_angle = square1.angle + (square1.angularSpeed * deltaTime);
