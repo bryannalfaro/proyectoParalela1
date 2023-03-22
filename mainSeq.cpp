@@ -181,7 +181,6 @@ int main(int argc, char *argv[])
             square.y = -1;
             square.width = 0;
             square.height = 0;
-            cout << "Square " << i << " was not created" << endl;
         }
 
         // Add square
@@ -273,7 +272,6 @@ int main(int argc, char *argv[])
                     {
                         squaresArray[i].width = squaresArray[i].width / 2;
                         squaresArray[i].height = squaresArray[i].height / 2;
-                        cout << "COLLISION EVERYWHERE" << endl;
                     }
                     else if (hasIntersection_next)
                     {
