@@ -276,9 +276,9 @@ int main(int argc, char *argv[])
                     int posJx = nextPosJ.x;
                     int posJy = nextPosJ.y;
 
-                    SDL_Rect rectanglei = {posIx, posIy, squaresArray[i].width, squaresArray[i].height};
-                    SDL_Rect rectanglej = {posJx, posJy, squaresArray[j].width, squaresArray[j].height};
-                    SDL_bool hasIntersectionNext = SDL_HasIntersection(&rectanglei, &rectanglej);
+                    SDL_Rect rectangleI = {posIx, posIy, squaresArray[i].width, squaresArray[i].height};
+                    SDL_Rect rectangleJ = {posJx, posJy, squaresArray[j].width, squaresArray[j].height};
+                    SDL_bool hasIntersectionNext = SDL_HasIntersection(&rectangleI, &rectangleJ);
 
                     // other pos i
                     NextPos otherNextPosI = getNextPosition(squaresArray[i], deltaTime * (-1));
@@ -290,9 +290,9 @@ int main(int argc, char *argv[])
                     int otherPosJx = otherNextPosJ.x;
                     int otherPosJy = otherNextPosJ.y;
 
-                    SDL_Rect otherrectanglei = {otherPosIx, otherPosIy, squaresArray[i].width, squaresArray[i].height};
-                    SDL_Rect otherrectanglej = {otherPosJx, otherPosJy, squaresArray[j].width, squaresArray[j].height};
-                    SDL_bool otherHasIntersectionNext = SDL_HasIntersection(&otherrectanglei, &otherrectanglej);
+                    SDL_Rect otherRectangleI = {otherPosIx, otherPosIy, squaresArray[i].width, squaresArray[i].height};
+                    SDL_Rect otherRectangleJ = {otherPosJx, otherPosJy, squaresArray[j].width, squaresArray[j].height};
+                    SDL_bool otherHasIntersectionNext = SDL_HasIntersection(&otherRectangleI, &otherRectangleJ);
 
                     if (hasIntersectionNext && otherHasIntersectionNext)
                     {
