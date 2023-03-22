@@ -93,17 +93,17 @@ Square generateRandomSquare(SDL_Window *window)
 bool checkCollision(Square square1, Square square2)
 {
     // Calculate the x- and y-coordinates of the bounding boxes
-    int square1_x1 = square1.x;
-    int square1_x2 = square1.x + square1.width;
-    int square1_y1 = square1.y;
-    int square1_y2 = square1.y + square1.height;
-    int square2_x1 = square2.x;
-    int square2_x2 = square2.x + square2.width;
-    int square2_y1 = square2.y;
-    int square2_y2 = square2.y + square2.height;
+    int square1X1 = square1.x;
+    int square1X2 = square1.x + square1.width;
+    int square1Y1 = square1.y;
+    int square1Y2 = square1.y + square1.height;
+    int square2X1 = square2.x;
+    int square2X2 = square2.x + square2.width;
+    int square2Y1 = square2.y;
+    int square2Y2 = square2.y + square2.height;
 
     // Check if the bounding boxes overlap in both x- and y-coordinates
-    if (square1_x1 < square2_x2 && square1_x2 > square2_x1 && square1_y1 < square2_y2 && square1_y2 > square2_y1)
+    if (square1X1 < square2X2 && square1X2 > square2X1 && square1Y1 < square2Y2 && square1Y2 > square2Y1)
     {
         return true; // Squares are colliding
     }
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
     double timeInit = omp_get_wtime();
 
 // Generate N random squares
-#pragma omp parallel for num_threads(numThreads)
+#pragma omp parallel for num_threads(numThreads) schedule(dynamic,1000)
     for (int i = 0; i < numberSquares; i++)
     {
         Square square;
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
             {
                 squaresArray[i].angularSpeed *= -1;
             }
-            #pragma omp parallel for num_threads(numThreads)
+            #pragma omp parallel for num_threads(numThreads) schedule(dynamic,1000)
             for (int j = 0; j < numberSquares; j++)
             {
                 // Check for collision with other balls and swap velocities if collision occurs
@@ -242,50 +242,50 @@ int main(int argc, char *argv[])
                 {
                     // next pos i
                     // Update angle
-                    float i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
+                    float angleI = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime);
 
                     // Update position
-                    int i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(i_angle);
-                    int i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(i_angle);
+                    int posIx = squaresArray[i].initialX + squaresArray[i].radius * cos(angleI);
+                    int posIy = squaresArray[i].initialY + squaresArray[i].radius * sin(angleI);
 
                     // next pos j
                     // Update angle
-                    float j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime);
+                    float angleJ = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime);
 
                     // Update position
-                    int j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(j_angle);
-                    int j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(j_angle);
+                    int posJx = squaresArray[j].initialX + squaresArray[j].radius * cos(angleJ);
+                    int posJy = squaresArray[j].initialY + squaresArray[j].radius * sin(angleJ);
 
-                    SDL_Rect rectanglei = {i_x, i_y, squaresArray[i].width, squaresArray[i].height};
-                    SDL_Rect rectanglej = {j_x, j_y, squaresArray[j].width, squaresArray[j].height};
-                    SDL_bool hasIntersection_next = SDL_HasIntersection(&rectanglei, &rectanglej);
+                    SDL_Rect rectanglei = {posIx, posIy, squaresArray[i].width, squaresArray[i].height};
+                    SDL_Rect rectanglej = {posJx, posJy, squaresArray[j].width, squaresArray[j].height};
+                    SDL_bool hasIntersectionNext = SDL_HasIntersection(&rectanglei, &rectanglej);
 
                     // other pos i
                     // Update angle
-                    float other_i_angle = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime * (-1));
+                    float otherAngleI = squaresArray[i].angle + (squaresArray[i].angularSpeed * deltaTime * (-1));
 
                     // Update position
-                    int other_i_x = squaresArray[i].initialX + squaresArray[i].radius * cos(other_i_angle);
-                    int other_i_y = squaresArray[i].initialY + squaresArray[i].radius * sin(other_i_angle);
+                    int otherPosIx = squaresArray[i].initialX + squaresArray[i].radius * cos(otherAngleI);
+                    int otherPosIy = squaresArray[i].initialY + squaresArray[i].radius * sin(otherAngleI);
 
                     // other pos j
                     // Update angle
-                    float other_j_angle = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime * (-1));
+                    float otherAngleJ = squaresArray[j].angle + (squaresArray[j].angularSpeed * deltaTime * (-1));
 
                     // Update position
-                    int other_j_x = squaresArray[j].initialX + squaresArray[j].radius * cos(other_j_angle);
-                    int other_j_y = squaresArray[j].initialY + squaresArray[j].radius * sin(other_j_angle);
+                    int otherPosJx = squaresArray[j].initialX + squaresArray[j].radius * cos(otherAngleJ);
+                    int otherPosJy = squaresArray[j].initialY + squaresArray[j].radius * sin(otherAngleJ);
 
-                    SDL_Rect otherrectanglei = {other_i_x, other_i_y, squaresArray[i].width, squaresArray[i].height};
-                    SDL_Rect otherrectanglej = {other_j_x, other_j_y, squaresArray[j].width, squaresArray[j].height};
-                    SDL_bool otherhasIntersection_next = SDL_HasIntersection(&otherrectanglei, &otherrectanglej);
+                    SDL_Rect otherRectangleI = {otherPosIx, otherPosIy, squaresArray[i].width, squaresArray[i].height};
+                    SDL_Rect otherRectangleJ = {otherPosJx, otherPosJy, squaresArray[j].width, squaresArray[j].height};
+                    SDL_bool otherHasIntersectionNext = SDL_HasIntersection(&otherRectangleI, &otherRectangleJ);
 
-                    if (hasIntersection_next && otherhasIntersection_next)
+                    if (hasIntersectionNext && otherHasIntersectionNext)
                     {
                         squaresArray[i].width = squaresArray[i].width / 2;
                         squaresArray[i].height = squaresArray[i].height / 2;
                     }
-                    else if (hasIntersection_next)
+                    else if (hasIntersectionNext)
                     {
                         squaresArray[i].angularSpeed *= -1;
                     }
@@ -326,8 +326,8 @@ int main(int argc, char *argv[])
         }
         if (firstTime)
         {
-            double t_fin = omp_get_wtime();
-            double delta = t_fin - timeInit;
+            double timeFin = omp_get_wtime();
+            double delta = timeFin - timeInit;
             cout << "Paralel version 1 program took " << delta << " seconds" << endl;
         }
         firstTime = false;

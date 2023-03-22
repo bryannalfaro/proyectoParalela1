@@ -1,9 +1,9 @@
 /**
- * @file mainPar2.cpp
+ * @file mainPar3.cpp
  * @author Raul Jimenez
  * @author Bryann Alfaro
  * @author Donaldo Garcia
- * @brief Main file of the project that has the screen saver simulation parallel version 2.
+ * @brief Main file of the project that has the screen saver simulation version 3.
  * @version 0.1
  * @date 2023-03-22
  *
@@ -50,9 +50,9 @@ struct Square
  */
 struct NextPos
 {
-    float angle; // Angle
-    int x;       // x-coordinate of top left corner
-    int y;       // y-coordinate of top left corner
+    float angle;
+    int x;
+    int y;
 };
 
 // Generate a random square within the bounds of the window
@@ -114,20 +114,14 @@ bool checkCollision(Square square1, Square square2)
     int square2Y2 = square2.y + square2.height;
 
     // Check if the bounding boxes overlap in both x- and y-coordinates
-    if (square1X1 < square2X2 && square1X2 > square2X1 &&square1Y1 < square2Y2 && square1Y2 > square2Y1)
+    if (square1X1 < square2X2 && square1X2 > square2X1 && square1Y1 < square2Y2 && square1Y2 > square2Y1)
     {
         return true; // Squares are colliding
     }
     return false; // Squares are not colliding
 }
 
-/**
- * @brief Get the Next Position object
- *
- * @param square1 Square 1 type Square
- * @param deltaTime float time between frames
- * @return NextPos with the next position of the square
- */
+
 NextPos getNextPosition(Square square1, float deltaTime)
 {
     float angleI = square1.angle + (square1.angularSpeed * deltaTime);
@@ -190,11 +184,12 @@ int main(int argc, char *argv[])
     double timeInit = omp_get_wtime();
 
 // Generate N random squares
-#pragma omp parallel for num_threads(numThreads)
+#pragma omp tile sizes(8, 8)
     for (int i = 0; i < numberSquares; i++)
     {
         Square square;
         square = generateRandomSquare(window);
+
 
         int numberOfTries = 0;
         int j = 0;
@@ -206,6 +201,7 @@ int main(int argc, char *argv[])
             if (checkCollision(square, previousSquare))
             {
                 // If the square collides with a previous square then generate a new square
+
                 square = generateRandomSquare(window);
                 numberOfTries++;
                 j = -1;
@@ -251,6 +247,7 @@ int main(int argc, char *argv[])
         float deltaTime = (currentTicks - prevTicks) / 1000.0f;
         prevTicks = currentTicks;
         // --------------------
+        #pragma omp parallel for num_threads(numThreads) schedule(dynamic, 1)
         for (int i = 0; i < numberSquares; i++)
         {
             // check for collision with the walls
@@ -263,7 +260,7 @@ int main(int argc, char *argv[])
                 squaresArray[i].angularSpeed *= -1;
             }
 
-#pragma omp parallel for num_threads(numThreads) schedule(static, 100)
+#pragma omp parallel for num_threads(numThreads) schedule(dynamic, 1)
             for (int j = 0; j < numberSquares; j++)
             {
                 // Check for collision with other balls and swap velocities if collision occurs
@@ -311,6 +308,7 @@ int main(int argc, char *argv[])
         }
 
         // update the values
+
         for (int i = 0; i < numberSquares; i++)
         {
             NextPos nextPositionSquare = getNextPosition(squaresArray[i], deltaTime);
@@ -343,7 +341,7 @@ int main(int argc, char *argv[])
         {
             double timeFin = omp_get_wtime();
             double delta = timeFin - timeInit;
-            cout << "Parallel version 2 program took " << delta << " seconds" << endl;
+            cout << "Parallel version 3 program took " << delta << " seconds" << endl;
         }
         firstTime = false;
     }
