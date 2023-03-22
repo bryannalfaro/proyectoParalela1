@@ -3,7 +3,7 @@
  * @author Raul Jimenez
  * @author Bryann Alfaro
  * @author Donaldo Garcia
- * @brief Main file of the project that has the screen saver simulation secuential.
+ * @brief Main file of the project that has the screen saver simulation parallel version1.
  * @version 0.1
  * @date 2023-03-22
  *
